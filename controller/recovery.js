@@ -1,5 +1,5 @@
 const User= require("../model/userModel")
-const bcrypt =require("bcrypt")
+const bcrypt =require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const emailCheck = require("../middleware/nodemailer")
 const PassRecovery = require("../model/passRecoveryModel")
