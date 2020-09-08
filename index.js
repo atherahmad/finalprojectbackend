@@ -15,9 +15,9 @@ app.use("/api/dashboard",require("./router/dashboard"))
 app.use("/api/account", require("./router/account"))
 app.use("/api/products", require("./router/products"))
 app.use("/api/buy", require("./router/buy"))
+app.use("/api/contact", require("./router/contact"))
 app.use("/api/messages", require("./router/messages"))
-
-
+app.use("/api/messages", require("./router/messages"))
 
 app.listen(process.env.PORT, ()=>{
     console.log(`Server is running on port ${process.env.PORT}`)
