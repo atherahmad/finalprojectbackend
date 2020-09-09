@@ -46,8 +46,8 @@ const UserSchema = new mongoose.Schema({
     status:{
         type:Boolean
     },
-    accessLevel:{
-        type:String
+    admin:{
+        type:Boolean
     },
     confirmed:{
         type:Boolean,

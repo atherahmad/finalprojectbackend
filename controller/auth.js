@@ -28,11 +28,12 @@ exports.signin=async (req,res)=>{
                    if(isPassCorrect) {
                         if(result.confirmed){
                                 const token = await createToken(result.id)
-                                const {id, firstName, lastName,liked,email } = result
+                                const {id, firstName, lastName,liked,email , admin} = result
+                                console.log(result, admin, "at signin ")
                                 res.json({
                                     status   :"success",
                                     message  : "Welcome! you are successfully logged in. ",
-                                    data     : {id, firstName, lastName, liked,email}, 
+                                    data     : {id, firstName, lastName, liked,email,admin},
                                     token
                                      })
                                     }   else res.json({
@@ -66,7 +67,7 @@ exports.signup=async (req,res)=>{
                 email,
                 pass:hashedPass,   
                 confirmed:false,
-                accessLevel : "user"
+                admin:false
             });
      newUser.save(async(err, doc)=>{
                 if(err) res.status(500).json({status: "failed", message:err})
@@ -91,7 +92,7 @@ exports.signup=async (req,res)=>{
 //Checking Authentication of user
 
 exports.authenticated=async(req,res)=>{
-    await User.findById(req.userId,{_id:1,firstName:1,liked:1,email:1} ,(err, doc)=>{
+    await User.findById(req.userId,{_id:1,firstName:1,liked:1,email:1,admin:1} ,(err, doc)=>{
         if(err) return res.json({status:"failed", message:"Unable to retrieve your data please try again"})
 
         res.json({status:"success", message:"You have been authorized", data:doc})
