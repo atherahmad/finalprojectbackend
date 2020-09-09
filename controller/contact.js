@@ -1,11 +1,28 @@
 const ActiveProducts = require("../model/activeProductModel")
-const User = require("../model/userModel")
+const Querry = require("../model/querriesModel")
 const jwt = require("jsonwebtoken")
 const jwtSecretKey= process.env.JWT_SECRET_KEY
 const emailCheck = require("../middleware/nodemailer")
 
 exports.querry = async (req, res) => {
     console.log(req.body, "at contact")
+
+  
+        const newQuerry = new Querry({
+            name:req.body.name,
+            email:req.body.email,
+            subject:req.body.subject,
+            message:req.body.messageText,
+            completed:false})
+            
+        await newQuerry.save(async(err,doc)=>{
+            if(err) {
+                res.json({status:"failed", message:"Currently unable to send your meesage please try again", data:err})
+                throw err
+            }
+            else {
+                                    
+
 
 
     let resetLinkSent = await emailCheck.confirmation({
@@ -24,8 +41,9 @@ exports.querry = async (req, res) => {
             <p>${req.body.messageText}</p>`
     })
     if(resetLinkSent) res.json({success: "We have recieved your querry"})
-        else res.json({status:"failed", message:"Sorry we are unable to proccess your request please try again later"})
+        else res.json({status:"failed", message:"Sorry we are unable to proccess your request please try again later"})}
 
+})
 }
 //email, subject, text,html
 
