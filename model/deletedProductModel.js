@@ -1,6 +1,7 @@
 const mongoose = require("mongoose")
 const User = require("./userModel")
 const DeletedProductSchema= new mongoose.Schema({
+    
     _id:{
         type:mongoose.Types.ObjectId
     },
