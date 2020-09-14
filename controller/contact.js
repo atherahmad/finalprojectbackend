@@ -1,13 +1,9 @@
-const ActiveProducts = require("../model/activeProductModel")
 const Querry = require("../model/querriesModel")
-const jwt = require("jsonwebtoken")
-const jwtSecretKey= process.env.JWT_SECRET_KEY
+const Complaint=require("../model/reportModel")
 const emailCheck = require("../middleware/nodemailer")
 
 exports.querry = async (req, res) => {
-    console.log(req.body, "at contact")
 
-  
         const newQuerry = new Querry({
             name:req.body.name,
             email:req.body.email,
@@ -45,62 +41,23 @@ exports.querry = async (req, res) => {
 
 })
 }
-//email, subject, text,html
 
-exports.complaint = async (req, res) => {
-    console.log("you reached")
+exports.report = async (req, res) => {
 
-    const id = req.params.id
-    let product = await ActiveProducts.findById(id, {
-        title: 1,
-        category: 1,
-        condition: 1,
-        quantity: 1,
-        color: 1,
-        price: 1,
-        description: 1,
-        creator: 1,
-        views: 1,
-        images: 1
-    })
-    .populate([{path:"creator",select:"firstName", model:User}])
-    .populate()
+    const newComplaint = new Complaint({
+        productId:req.body.productId,
+        creatorId:req.body.creatorId,
+        title:req.body.title,
+        message:req.body.message,
+        completed:false})
 
-    if (!product) res.json({ status: "failed", message: "No such product found" })
-    else {
-        const token = req.header("x-auth-token")
-        if(!token){
-            product.favorit=false
-            res.json({success:product})
+        await newComplaint.save(async(err,doc)=>{
+            if(err) {
+                res.json({status:"failed", message:"Currently unable to process your request please try again", data:err})
+                throw err
             }
-            else
-                try{
-                    jwt.verify(token, jwtSecretKey,async(fail, decodedPayload)=>{
-                        if(fail){  
-                            product.favorit=false
-                            res.json({failed:"Authentication failed not"})
-                            }
-                            else await User.findById(decodedPayload.id,{liked:1},(err,doc)=>{
-                                if(err) res.json({failed:err})
-                                    else {
-                                        if(doc.liked.includes(id)) {
-                                            res.json({success:product, favorit:true})
-                                            }
-                                            else{
-                                                res.json({success:product,favorit:false})
-                                                }
-                                    }
-                            })
-                        
-                    })
-                } 
-                catch(error){
-                    res.json({
-                        status:"failed",
-                        message:error
-                    }) 
-            }
-
-    }
-
+            else 
+            res.send({success:"We recieved your complaint and will act accordingly"})
+        })
+        
 }
