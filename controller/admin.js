@@ -2,6 +2,7 @@ const Querry = require("../model/querriesModel")
 const User=require("../model/userModel")
 const Complaints=require("../model/reportModel")
 const ActiveProducts = require("../model/activeProductModel")
+const AllProducts = require("../model/allProductModel")
 const BlockedProduct=require("../model/blockedProductModel")
 const SoldProducts=require("../model/soldProductModel")
 const InactiveProducts=require("../model/inactiveProductModel")
@@ -53,6 +54,7 @@ exports.blockProduct = async (req, res) => {
         if(result){
             result.remove()
             result=result.toObject()
+            result.active=false
             result.blocked=true
             let swap = new BlockedProduct(result)
             swap.save()
@@ -62,7 +64,7 @@ exports.blockProduct = async (req, res) => {
     })
 }
     exports.activeproducts = async (req, res) => {
-                ActiveProducts.find({},{_id:1, title:1, creator:1, timeStamp:1, category:1},(err, doc) => {
+                ActiveProducts.find({},{_id:1, title:1, creator:1, timeStamp:1, category:1, status:"Active"},(err, doc) => {
                     if (err) res.json({ status: "failed", message: err })
                     else {
                         res.send({
@@ -74,7 +76,7 @@ exports.blockProduct = async (req, res) => {
         }
 
     exports.blockedproducts = async (req, res) => {
-        BlockedProduct.find({},{_id:1, title:1, creator:1, timeStamp:1, category:1},(err, doc) => {
+        BlockedProduct.find({},{_id:1, title:1, creator:1, timeStamp:1, category:1, status:"Blocked"},(err, doc) => {
                 if (err) res.json({ status: "failed", message: err })
                 else {
                     res.send({
@@ -86,7 +88,7 @@ exports.blockProduct = async (req, res) => {
     }
 
     exports.deletedproducts = async (req, res) => {
-        DeletedProducts.find({},{_id:1, title:1, creator:1, timeStamp:1, category:1},(err, doc) => {
+        DeletedProducts.find({},{_id:1, title:1, creator:1, timeStamp:1, category:1, status:"Deleted"},(err, doc) => {
             if (err) res.json({ status: "failed", message: err })
             else {
                 res.send({
@@ -98,7 +100,7 @@ exports.blockProduct = async (req, res) => {
 }
 
 exports.soldproducts = async (req, res) => {
-    SoldProducts.find({},{_id:1, title:1, creator:1, timeStamp:1, category:1},(err, doc) => {
+    SoldProducts.find({},{_id:1, title:1, creator:1, timeStamp:1, category:1, status:"Sold"},(err, doc) => {
         if (err) res.json({ status: "failed", message: err })
         else {
             res.send({
@@ -110,7 +112,7 @@ exports.soldproducts = async (req, res) => {
 }
 
 exports.inactiveproducts = async (req, res) => {
-    InactiveProducts.find({},{_id:1, title:1, creator:1, timeStamp:1, category:1},(err, doc) => {
+    InactiveProducts.find({},{_id:1, title:1, creator:1, timeStamp:1, category:1, status:"Inactive"},(err, doc) => {
         if (err) res.json({ status: "failed", message: err })
         else {
             res.send({
@@ -121,7 +123,7 @@ exports.inactiveproducts = async (req, res) => {
 }
 
 exports.allproducts = async (req, res) => {
-    ActiveProducts.find({},{_id:1, title:1, creator:1, timeStamp:1, category:1},(err, doc) => {
+    AllProducts.find({},{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, deleted:1, blocked:1, sold:1},(err, doc) => {
         if (err) res.json({ status: "failed", message: err })
         else {
             res.send({

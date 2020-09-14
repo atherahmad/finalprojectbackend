@@ -1,5 +1,6 @@
 
 const ActiveProduct = require("../model/activeProductModel");
+const AllProducts = require("../model/allProductModel")
 const InActiveProduct = require("../model/inactiveProductModel")
 const SoldProduct = require("../model/soldProductModel")
 const DeletedProduct = require("../model/deletedProductModel")
@@ -20,8 +21,8 @@ exports.newProduct = async (req,res)=>{
                     else if(price>=100) priceRange=3
                         else if(price>=50) priceRange=2
                             else priceRange=1
-                            
-            const newProduct = new ActiveProduct({
+
+            const newAllProduct= new AllProducts({
                 title,
                 category,
                 condition,
@@ -35,16 +36,40 @@ exports.newProduct = async (req,res)=>{
                 active:true,
                 views:0,
                 watching:[],
-                priceRange
+                priceRange,
+                deleted:false
 
 
             })
-        
-            newProduct.save((err,doc)=>{
-                if(err) {res.json({status:"failed", message:err})}
-                    else res.json({status:"success", message:"you have successfuly posted your product", data:doc})
-            }) 
-    }
+
+            newAllProduct.save((err,doc)=>{
+                if(err) res.json({status:"failed", message:err})
+                    else {
+                        const newProduct = new ActiveProduct({
+                            title,
+                            category,
+                            condition,
+                            quantity,
+                            color,
+                            price,
+                            description,
+                            creator,
+                            blocked:false,
+                            sold:false,
+                            active:true,
+                            views:0,
+                            watching:[],
+                            priceRange
+                        })
+                    
+                        newProduct.save((err,doc)=>{
+                            if(err) {res.json({status:"failed", message:err})}
+                                else res.json({status:"success", message:"you have successfuly posted your product"})
+                        }) 
+                    }
+
+            })
+        }
     else{
         
         let fileName;
@@ -75,7 +100,8 @@ exports.newProduct = async (req,res)=>{
                 cp.spawnSync('convert',[f.path,'-resize','500x',thumbPath]);
             })
             let images=req.files.map(values=>values.filename)
-            const newProduct = new ActiveProduct({
+
+            const newAllProduct= new AllProducts({
                 title,
                 category,
                 condition,
@@ -83,22 +109,50 @@ exports.newProduct = async (req,res)=>{
                 color,
                 price,
                 description,
-                images,
-                priceRange,
                 creator,
                 blocked:false,
                 sold:false,
                 active:true,
                 views:0,
-                watching:[]
+                watching:[],
+                priceRange,
+                deleted:false,
+                images
+
+
             })
-            await newProduct.save((err,doc)=>{
-                if(err) {res.json({status:"failed", message:err})}
-                    else res.json({status:"success", message:"you have successfuly posted your product", data:doc})
-            }) 
+
+            newAllProduct.save((err,doc)=>{
+                if(err) res.json({status:"failed", message:err})
+                    else {
+                        const newProduct = new ActiveProduct({
+                            title,
+                            category,
+                            condition,
+                            quantity,
+                            color,
+                            price,
+                            description,
+                            creator,
+                            blocked:false,
+                            sold:false,
+                            active:true,
+                            views:0,
+                            watching:[],
+                            priceRange,
+                            images
+                        })
+                    
+                        newProduct.save((err,doc)=>{
+                            if(err) {res.json({status:"failed", message:err})}
+                                else res.json({status:"success", message:"you have successfuly posted your product"})
+                        }) 
+                    }
+            })
         })
     }
 }
+
 
 exports.inactiveProduct=async(req,res)=>{
     const productId= req.body.data.id  
@@ -110,7 +164,10 @@ exports.inactiveProduct=async(req,res)=>{
         result.active=false
         let swap = new InActiveProduct(result)
         swap.save()
-        res.json({success:"You have successfully deactivated the Product"})
+        AllProducts.findByIdAndUpdate({_id:req.body.data.id},{active:false},(err,doc)=>{
+            if(err) res.json({failed:"Sorry! your request is failed"})
+                else res.json({success:"You have successfully updated product"})
+        })
         }
     })
     
@@ -124,9 +181,13 @@ exports.soldProduct=async(req,res)=>{
             result.remove()
             result=result.toObject()
             result.sold=true
+            result.active=false
             let swap = new SoldProduct(result)
             swap.save()
-            res.json({success:"You have successfully marked the Product Sold"})
+            AllProducts.findByIdAndUpdate(req.body.data.id,{sold:true, active:false},(err,doc)=>{
+                if(err) res.json({failed:"Sorry! your request is failed"})
+                    else res.json({success:"You have successfully updated product"})
+            })
         }
 
     })
@@ -139,9 +200,14 @@ exports.deleteProduct=async(req,res)=>{
         if(result){
             result.remove()
             result=result.toObject()
+            result.active=false
+            result.deleted=true
             let swap = new DeletedProduct(result)
             swap.save()
-            res.json({success:"You have deleted the Product successfully"})
+            AllProducts.findByIdAndUpdate(req.body.data.id,{deleted:true, active:false},(err,doc)=>{
+                if(err) res.json({failed:"Sorry! your request is failed"})
+                    else res.json({success:"You have successfully updated product"})
+            })
         }
 })
 }
@@ -156,7 +222,10 @@ exports.activateProduct=async(req,res)=>{
             result.active=true
             let swap = new ActiveProduct(result)
             swap.save();
-            res.json({success:"You have successfully Activated the Product"})
+            AllProducts.findByIdAndUpdate(req.body.data.id,{active:true},(err,doc)=>{
+                if(err) res.json({failed:"Sorry! your request is failed"})
+                    else res.json({success:"You have successfully updated product"})
+            })
         }
     })
 }
