@@ -3,7 +3,10 @@ const User=require("../model/userModel")
 const Complaints=require("../model/reportModel")
 const ActiveProducts = require("../model/activeProductModel")
 const AllProducts = require("../model/allProductModel")
-const BlockedProduct=require("../model/blockedProductModel")
+const BlockedProducts=require("../model/blockedProductModel")
+const InactiveProducts=require("../model/inactiveProductModel")
+const SoldProducts = require("../model/soldProductModel")
+const DeletedProducts = require("../model/deletedProductModel")
 
 exports.querriesList = async (req, res) => {
 
@@ -45,27 +48,38 @@ exports.complaintsList = async (req, res) => {
 }
 
 exports.blockProduct = async (req, res) => {
-    
-    await ActiveProducts.findOne({_id:req.body.data.id},(err,result)=>{
-        if(err) return res.json({failed:"Sorry! your request is failed"})
-        if(result){
-            result.remove()
-            result=result.toObject()
-            result.active=false
-            result.blocked=true
-            let swap = new BlockedProduct(result)
-            swap.save()
-            AllProducts.findOneAndUpdate({refId:req.body.data.id},{blocked:true},async (err, doc)=>{
-                if(err) res.send({failed:err})
-                    else res.json({success:"You ghave Successfully blocked the product"})
-            })
-        }
+    console.log(req.body.id, "comoing from block req")+
+
+    await AllProducts.findById(req.body.id, {refId:1}, async (err,doc)=>{
+
+        if(err) res.json({failed:"request failed"})
+
+            else await ActiveProducts.findById(doc.refId,(err,result)=>{
+                if(err) return res.json({failed:"Sorry! your request is failed"})
+                    else console.log(result)
+                if(result){
         
+        
+                    result.remove()
+                    result=result.toObject()
+                    result.active=false
+                    result.blocked=true
+                    let swap = new BlockedProducts(result)
+                    swap.save()
+                    AllProducts.findByIdAndUpdate(req.body.id,{blocked:true, active:false},async (err, doc)=>{
+                        if(err) res.send({failed:err})
+                            else res.json({success:"You ghave Successfully blocked the product"})
+                    })
+                }
+                
+            })
     })
+
+
 }
     exports.activeProducts = async (req, res) => {
-                AllProducts.find({active:true},{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, blocked:1, sold:1, deleted:1, refId:1},(err, doc) => {
-                    if (err) res.json({ status: "failed", message: err })
+                AllProducts.find({active:true},{_id:1, title:1, creator:1, timeStamp:1,  active:1, blocked:1, sold:1, deleted:1},(err, doc) => {
+                    if (err) res.json({ failed: err })
                     else {
                         res.send({
                             success: doc
@@ -76,8 +90,8 @@ exports.blockProduct = async (req, res) => {
         }
 
     exports.blockedProducts = async (req, res) => {
-        AllProducts.find({blocked:true},{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, blocked:1, sold:1, deleted:1, refId:1},(err, doc) => {
-                if (err) res.json({ status: "failed", message: err })
+        AllProducts.find({blocked:true},{_id:1, title:1, creator:1, timeStamp:1,  active:1, blocked:1, sold:1, deleted:1},(err, doc) => {
+                if (err) res.json({ failed: err })
                 else {
                     res.send({
                         success: doc
@@ -88,8 +102,8 @@ exports.blockProduct = async (req, res) => {
     }
 
     exports.deletedProducts = async (req, res) => {
-        AllProducts.find({deleted:true},{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, blocked:1, sold:1, deleted:1, refId:1},(err, doc) => {
-            if (err) res.json({ status: "failed", message: err })
+        AllProducts.find({deleted:true},{_id:1, title:1, creator:1, timeStamp:1, active:1, blocked:1, sold:1, deleted:1},(err, doc) => {
+            if (err) res.json({ failed: err })
             else {
                 res.send({
                     success: doc
@@ -100,8 +114,8 @@ exports.blockProduct = async (req, res) => {
 }
 
 exports.soldProducts = async (req, res) => {
-    AllProducts.find({sold:true},{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, blocked:1, sold:1, deleted:1, refId:1},(err, doc) => {
-        if (err) res.json({ status: "failed", message: err })
+    AllProducts.find({sold:true},{_id:1, title:1, creator:1, timeStamp:1, active:1, blocked:1, sold:1, deleted:1},(err, doc) => {
+        if (err) res.json({ failed: err })
         else {
             res.send({
                 success: doc
@@ -112,9 +126,10 @@ exports.soldProducts = async (req, res) => {
 }
 
 exports.inactiveProducts = async (req, res) => {
-    AllProducts.find({active:false, blocked:false, deleted:false, sold:false},{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, blocked:1, sold:1, deleted:1, refId:1},(err, doc) => {
-        if (err) res.json({ status: "failed", message: err })
+    AllProducts.find({active:false, blocked:false, deleted:false, sold:false},{_id:1, title:1, creator:1, timeStamp:1, active:1, blocked:1, sold:1, deleted:1},(err, doc) => {
+        if (err) res.json({failed: err })
         else {
+
             res.send({
                 success: doc
             })
@@ -123,10 +138,10 @@ exports.inactiveProducts = async (req, res) => {
 }
 
 exports.allProducts = async (req, res) => {
-    AllProducts.find({},{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, deleted:1, blocked:1, sold:1, refId:1},(err, doc) => {
-        if (err) res.json({ status: "failed", message: err })
+    AllProducts.find({},{title:1, creator:1, timeStamp:1, category:1, active:1, deleted:1, blocked:1, sold:1, refId:1},(err, doc) => {
+        if (err) res.json({ failed: err })
         else {
-
+            doc._id=doc.refId
             res.send({
                 success: doc
             })
@@ -171,4 +186,75 @@ exports.updateUser=async (req,res)=>{
         if(err) res.json({failed:"request failed try again"})
             else res.json({success:"You have updated user Access"})
     })
+}
+
+exports.searchProduct=async(req,res)=>{
+
+    console.log(req.params.id, "req.params")
+    switch (req.params.category){
+
+        case "activeproducts":{
+            ActiveProducts.findOne({_id:req.params.id},{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, deleted:1, blocked:1, sold:1, refId:1},(err,doc)=>{
+                if(err) res.json({failed:"Request failed please try again"})
+                    else res.json({success:doc})
+            })
+        }
+        break;
+        case "inactiveproducts":{
+                InactiveProducts.findOne({_id:req.params.id},{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, deleted:1, blocked:1, sold:1, refId:1},(err,doc)=>{
+                if(err) res.json({failed:"Request failed please try again"})
+                    else res.json({success:doc})
+            })
+        }
+        break;
+        case "deletedproducts":{
+                DeletedProducts.findOne({_id:req.params.id},{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, deleted:1, blocked:1, sold:1, refId:1},(err,doc)=>{
+                if(err) res.json({failed:"Request failed please try again"})
+                    else res.json({success:doc})
+            })
+        }
+        break;
+        case "blockedproducts":{
+            BlockedProducts.findOne({_id:req.params.id},{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, deleted:1, blocked:1, sold:1, refId:1},(err,doc)=>{
+            if(err) res.json({failed:"Request failed please try again"})
+                else res.json({success:doc})
+        })
+    }
+    break;
+    case "soldproducts":{
+        SoldProducts.findOne({_id:req.params.id},{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, deleted:1, blocked:1, sold:1, refId:1},(err,doc)=>{
+        if(err) res.json({failed:"Request failed please try again"})
+            else res.json({success:doc})
+    })
+    }
+    break;
+    default:{
+        AllProducts.findOne({refId:req.params.id},{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, deleted:1, blocked:1, sold:1, refId:1},(err,doc)=>{
+            if(err) res.json({failed:"Request failed please try again"})
+                else res.json({success:doc})
+        })
+    }
+    break;
+}
+
+}
+
+exports.productDetails=async(req,res)=>{
+    console.log(req.params.id, "in prog details")
+    AllProducts.findOne({_id:req.params.id},{
+        title: 1,
+        price: 1,
+        description: 1,
+        creator: 1,
+        images: 1,
+        active:1
+    },
+    (err,doc)=>{
+        if(err) res.json({failed:"Request failed try again "})
+            else {
+                console.log(doc)
+                res.json({success:doc})}
+    } 
+    )
+
 }

@@ -15,6 +15,8 @@ router.get("/blockedproducts",auth.checkToken, admin.blockedProducts)
 router.get("/soldproducts",auth.checkToken, admin.soldProducts)
 router.get("/deletedproducts",auth.checkToken, admin.deletedProducts)
 router.get("/allproducts",auth.checkToken, admin.allProducts)
+router.get("/searchproduct/:category/:id",auth.checkToken, admin.searchProduct)
+router.get("/productdetails/:id", auth.checkToken, admin.productDetails)
 
 router.get(`/userdetails/:userId`, auth.checkToken, admin.userDetails)
 
