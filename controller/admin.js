@@ -67,7 +67,7 @@ exports.blockProduct = async (req, res) => {
     })
 }
     exports.activeproducts = async (req, res) => {
-                AllProducts.find({active:true},{_id:1, title:1, creator:1, timeStamp:1, category:1},(err, doc) => {
+                AllProducts.find({active:true},{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, blocked:1, sold:1, deleted:1, refId:1},(err, doc) => {
                     if (err) res.json({ status: "failed", message: err })
                     else {
                         res.send({
@@ -79,7 +79,7 @@ exports.blockProduct = async (req, res) => {
         }
 
     exports.blockedproducts = async (req, res) => {
-        AllProducts.find({blocked:true},{_id:1, title:1, creator:1, timeStamp:1, category:1},(err, doc) => {
+        AllProducts.find({blocked:true},{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, blocked:1, sold:1, deleted:1, refId:1},(err, doc) => {
                 if (err) res.json({ status: "failed", message: err })
                 else {
                     res.send({
@@ -91,7 +91,7 @@ exports.blockProduct = async (req, res) => {
     }
 
     exports.deletedproducts = async (req, res) => {
-        AllProducts.find({deleted:true},{_id:1, title:1, creator:1, timeStamp:1, category:1},(err, doc) => {
+        AllProducts.find({deleted:true},{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, blocked:1, sold:1, deleted:1, refId:1},(err, doc) => {
             if (err) res.json({ status: "failed", message: err })
             else {
                 res.send({
@@ -103,7 +103,7 @@ exports.blockProduct = async (req, res) => {
 }
 
 exports.soldproducts = async (req, res) => {
-    AllProducts.find({sold:true},{_id:1, title:1, creator:1, timeStamp:1, category:1},(err, doc) => {
+    AllProducts.find({sold:true},{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, blocked:1, sold:1, deleted:1, refId:1},(err, doc) => {
         if (err) res.json({ status: "failed", message: err })
         else {
             res.send({
@@ -115,7 +115,7 @@ exports.soldproducts = async (req, res) => {
 }
 
 exports.inactiveproducts = async (req, res) => {
-    AllProducts.find({active:false, blocked:false, deleted:false, sold:false},{_id:1, title:1, creator:1, timeStamp:1, category:1},(err, doc) => {
+    AllProducts.find({active:false, blocked:false, deleted:false, sold:false},{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, blocked:1, sold:1, deleted:1, refId:1},(err, doc) => {
         if (err) res.json({ status: "failed", message: err })
         else {
             res.send({
