@@ -35,7 +35,7 @@ exports.usersList = async (req, res) => {
 
 
 exports.complaintsList = async (req, res) => {
-    Complaints.find({},{_id:1, productId:1, title:1, creatorId:1, timeStamp:1, completed:1, message:1},(err, doc) => {
+    Complaints.find({},{_id:1, productId:1, title:1,  timeStamp:1, completed:1},(err, doc) => {
         if (err) res.json({ status: "failed", message: err })
         else {
             console.log(doc)
@@ -45,6 +45,13 @@ exports.complaintsList = async (req, res) => {
         }
     })
     
+}
+
+exports.complainDetails=async(req,res)=>{
+    Complaints.findById(req.params.id,(err,doc)=>{
+        if(err) res.json({failed:"Sorry your request failed"})
+            else res.json({success:doc})
+    })
 }
 
 exports.blockProduct = async (req, res) => {
@@ -78,7 +85,7 @@ exports.blockProduct = async (req, res) => {
 
 }
     exports.activeProducts = async (req, res) => {
-                AllProducts.find({active:true},{_id:1, title:1, creator:1, timeStamp:1,  active:1, blocked:1, sold:1, deleted:1},(err, doc) => {
+                AllProducts.find({active:true},{_id:1, title:1, creator:1, timeStamp:1,  active:1, blocked:1, sold:1, deleted:1, refId:1},(err, doc) => {
                     if (err) res.json({ failed: err })
                     else {
                         res.send({
@@ -90,7 +97,7 @@ exports.blockProduct = async (req, res) => {
         }
 
     exports.blockedProducts = async (req, res) => {
-        AllProducts.find({blocked:true},{_id:1, title:1, creator:1, timeStamp:1,  active:1, blocked:1, sold:1, deleted:1},(err, doc) => {
+        AllProducts.find({blocked:true},{_id:1, title:1, creator:1, timeStamp:1,  active:1, blocked:1, sold:1, deleted:1,refId:1},(err, doc) => {
                 if (err) res.json({ failed: err })
                 else {
                     res.send({
@@ -102,7 +109,7 @@ exports.blockProduct = async (req, res) => {
     }
 
     exports.deletedProducts = async (req, res) => {
-        AllProducts.find({deleted:true},{_id:1, title:1, creator:1, timeStamp:1, active:1, blocked:1, sold:1, deleted:1},(err, doc) => {
+        AllProducts.find({deleted:true},{_id:1, title:1, creator:1, timeStamp:1, active:1, blocked:1, sold:1, deleted:1, refId:1},(err, doc) => {
             if (err) res.json({ failed: err })
             else {
                 res.send({
@@ -114,7 +121,7 @@ exports.blockProduct = async (req, res) => {
 }
 
 exports.soldProducts = async (req, res) => {
-    AllProducts.find({sold:true},{_id:1, title:1, creator:1, timeStamp:1, active:1, blocked:1, sold:1, deleted:1},(err, doc) => {
+    AllProducts.find({sold:true},{_id:1, title:1, creator:1, timeStamp:1, active:1, blocked:1, sold:1, deleted:1, refId:1},(err, doc) => {
         if (err) res.json({ failed: err })
         else {
             res.send({
@@ -126,7 +133,7 @@ exports.soldProducts = async (req, res) => {
 }
 
 exports.inactiveProducts = async (req, res) => {
-    AllProducts.find({active:false, blocked:false, deleted:false, sold:false},{_id:1, title:1, creator:1, timeStamp:1, active:1, blocked:1, sold:1, deleted:1},(err, doc) => {
+    AllProducts.find({active:false, blocked:false, deleted:false, sold:false},{_id:1, title:1, creator:1, timeStamp:1, active:1, blocked:1, sold:1, deleted:1, refId:1},(err, doc) => {
         if (err) res.json({failed: err })
         else {
 
@@ -190,52 +197,27 @@ exports.updateUser=async (req,res)=>{
 
 exports.searchProduct=async(req,res)=>{
 
-    console.log(req.params.id, "req.params")
-    switch (req.params.category){
+    console.log(req.body.id, req.body.type, "req.body.")
+    if(req.body.type==="allproducts")
 
-        case "activeproducts":{
-            ActiveProducts.findOne({_id:req.params.id},{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, deleted:1, blocked:1, sold:1, refId:1},(err,doc)=>{
-                if(err) res.json({failed:"Request failed please try again"})
-                    else res.json({success:doc})
-            })
-        }
-        break;
-        case "inactiveproducts":{
-                InactiveProducts.findOne({_id:req.params.id},{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, deleted:1, blocked:1, sold:1, refId:1},(err,doc)=>{
-                if(err) res.json({failed:"Request failed please try again"})
-                    else res.json({success:doc})
-            })
-        }
-        break;
-        case "deletedproducts":{
-                DeletedProducts.findOne({_id:req.params.id},{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, deleted:1, blocked:1, sold:1, refId:1},(err,doc)=>{
-                if(err) res.json({failed:"Request failed please try again"})
-                    else res.json({success:doc})
-            })
-        }
-        break;
-        case "blockedproducts":{
-            BlockedProducts.findOne({_id:req.params.id},{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, deleted:1, blocked:1, sold:1, refId:1},(err,doc)=>{
-            if(err) res.json({failed:"Request failed please try again"})
-                else res.json({success:doc})
+        AllProducts.findOne({refId:req.body.id}
+                            ,{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, deleted:1, blocked:1, sold:1, refId:1},(err,doc)=>{
+    	    if(err) res.json({failed:"Request failed please try again"})
+    	        else res.json({success:doc})
         })
-    }
-    break;
-    case "soldproducts":{
-        SoldProducts.findOne({_id:req.params.id},{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, deleted:1, blocked:1, sold:1, refId:1},(err,doc)=>{
-        if(err) res.json({failed:"Request failed please try again"})
-            else res.json({success:doc})
-    })
-    }
-    break;
-    default:{
-        AllProducts.findOne({refId:req.params.id},{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, deleted:1, blocked:1, sold:1, refId:1},(err,doc)=>{
-            if(err) res.json({failed:"Request failed please try again"})
-                else res.json({success:doc})
-        })
-    }
-    break;
-}
+        else if(req.body.type==="inactive")
+                AllProducts.findOne({refId:req.body.id, active:false, blocked:false, deleted:false, sold:false}
+                             ,{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, deleted:1, blocked:1, sold:1, refId:1}
+                            ,(err,doc)=>{
+    	                        if(err) res.json({failed:"Request failed please try again"})
+    	                            else res.json({success:doc})
+                })
+            else AllProducts.findOne({refId:req.body.id, [req.body.type]:true}
+                ,{_id:1, title:1, creator:1, timeStamp:1, category:1, active:1, deleted:1, blocked:1, sold:1, refId:1}
+               ,(err,doc)=>{
+                   if(err) res.json({failed:"Request failed please try again"})
+                       else res.json({success:doc})})
+
 
 }
 
@@ -247,7 +229,8 @@ exports.productDetails=async(req,res)=>{
         description: 1,
         creator: 1,
         images: 1,
-        active:1
+        active:1,
+        refId:1
     },
     (err,doc)=>{
         if(err) res.json({failed:"Request failed try again "})
