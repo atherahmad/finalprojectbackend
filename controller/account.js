@@ -5,6 +5,7 @@ const ActiveProducts = require('../model/activeProductModel')
 const SoldProducts = require('../model/soldProductModel')
 const InActiveProducts = require("../model/inactiveProductModel")
 const cp      = require('child_process');
+const AllProducts = require("../model/allProductModel")
 
 
 
@@ -318,18 +319,28 @@ exports.editProduct = async (req, res) => {
                 await ActiveProducts.findOneAndUpdate(
                     {_id, creator}
                     ,{title,category,condition,quantity,color,price,description,images,priceRange}
-                    ,(err,doc)=>{ 
+                    ,async(err,doc)=>{ 
                         if(err) throw err
-                            else res.json({status:"success"})
+                            else {
+                                await AllProducts.findOneAndUpdate({refId:_id},{title,category,condition,quantity,color,price,description,priceRange, images},(err,doc)=>{
+                                   if(err) res.json({status:"failed", message:"Request failed"})
+                                        else res.json({status:"success"}) 
+                                } )
+                            }
                             })
                 }
             else 
                 await ActiveProducts.findOneAndUpdate(  
                 {_id, creator}
                 ,{title,category,condition,quantity,color,price,description,priceRange}
-                ,(err,doc)=>{ 
+                ,async (err,doc)=>{ 
                     if(err) throw err
-                        else res.json({status:"success"})
+                        else {
+                            await AllProducts.findOneAndUpdate({refId:_id},{title,category,condition,quantity,color,price,description,priceRange},(err,doc)=>{
+                               if(err) res.json({status:"failed", message:"Request failed"})
+                                    else res.json({status:"success"}) 
+                            } )
+                        }
                         })
         })
     }

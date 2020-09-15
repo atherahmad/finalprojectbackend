@@ -22,56 +22,54 @@ exports.newProduct = async (req,res)=>{
                         else if(price>=50) priceRange=2
                             else priceRange=1
 
-            const newAllProduct= new AllProducts({
-                title,
-                category,
-                condition,
-                quantity,
-                color,
-                price,
-                description,
-                creator,
-                blocked:false,
-                sold:false,
-                active:true,
-                views:0,
-                watching:[],
-                priceRange,
-                deleted:false
+    const newProduct = new ActiveProduct({
+        title,
+        category,
+        condition,
+        quantity,
+        color,
+        price,
+        description,
+        creator,
+        blocked:false,
+        sold:false,
+        active:true,
+        views:0,
+        watching:[],
+        priceRange
+    })
 
+    newProduct.save((err,doc)=>{
+        if(err) {res.json({status:"failed", message:err})}
+            else{
+                const newAllProduct= new AllProducts({
+                    title,
+                    category,
+                    condition,
+                    quantity,
+                    color,
+                    price,
+                    description,
+                    creator,
+                    blocked:false,
+                    sold:false,
+                    active:true,
+                    views:0,
+                    watching:[],
+                    priceRange,
+                    deleted:false,
+                    refId:doc._id
+                })
+
+                newAllProduct.save((err,doc)=>{
+                    if(err) res.json({status:"failed", message:err})
+                        else res.json({status:"success", message:"you have successfuly posted your product"})
+                })
+            }
 
             })
-
-            newAllProduct.save((err,doc)=>{
-                if(err) res.json({status:"failed", message:err})
-                    else {
-                        const newProduct = new ActiveProduct({
-                            title,
-                            category,
-                            condition,
-                            quantity,
-                            color,
-                            price,
-                            description,
-                            creator,
-                            blocked:false,
-                            sold:false,
-                            active:true,
-                            views:0,
-                            watching:[],
-                            priceRange
-                        })
-                    
-                        newProduct.save((err,doc)=>{
-                            if(err) {res.json({status:"failed", message:err})}
-                                else res.json({status:"success", message:"you have successfuly posted your product"})
-                        }) 
-                    }
-
-            })
-        }
+    }
     else{
-        
         let fileName;
         const storageTarget = multer.diskStorage({
             destination:"public/avatars",
@@ -101,7 +99,7 @@ exports.newProduct = async (req,res)=>{
             })
             let images=req.files.map(values=>values.filename)
 
-            const newAllProduct= new AllProducts({
+            const newProduct = new ActiveProduct({
                 title,
                 category,
                 condition,
@@ -116,16 +114,13 @@ exports.newProduct = async (req,res)=>{
                 views:0,
                 watching:[],
                 priceRange,
-                deleted:false,
                 images
-
-
             })
-
-            newAllProduct.save((err,doc)=>{
-                if(err) res.json({status:"failed", message:err})
-                    else {
-                        const newProduct = new ActiveProduct({
+        
+            newProduct.save((err,doc)=>{
+                if(err) {res.json({status:"failed", message:err})}
+                    else{
+                        const newAllProduct= new AllProducts({
                             title,
                             category,
                             condition,
@@ -140,15 +135,19 @@ exports.newProduct = async (req,res)=>{
                             views:0,
                             watching:[],
                             priceRange,
+                            deleted:false,
+                            refId:doc._id,
                             images
                         })
-                    
-                        newProduct.save((err,doc)=>{
-                            if(err) {res.json({status:"failed", message:err})}
+        
+                        newAllProduct.save((err,doc)=>{
+                            if(err) res.json({status:"failed", message:err})
                                 else res.json({status:"success", message:"you have successfuly posted your product"})
-                        }) 
+                        })
                     }
-            })
+        
+                    })
+
         })
     }
 }
@@ -164,7 +163,7 @@ exports.inactiveProduct=async(req,res)=>{
         result.active=false
         let swap = new InActiveProduct(result)
         swap.save()
-        AllProducts.findByIdAndUpdate({_id:req.body.data.id},{active:false},(err,doc)=>{
+        AllProducts.findOneAndUpdate({refId:req.body.data.id},{active:false},(err,doc)=>{
             if(err) res.json({failed:"Sorry! your request is failed"})
                 else res.json({success:"You have successfully updated product"})
         })
@@ -184,7 +183,7 @@ exports.soldProduct=async(req,res)=>{
             result.active=false
             let swap = new SoldProduct(result)
             swap.save()
-            AllProducts.findByIdAndUpdate(req.body.data.id,{sold:true, active:false},(err,doc)=>{
+            AllProducts.findOneAndUpdate({refId:req.body.data.id},{sold:true, active:false},(err,doc)=>{
                 if(err) res.json({failed:"Sorry! your request is failed"})
                     else res.json({success:"You have successfully updated product"})
             })
@@ -204,7 +203,7 @@ exports.deleteProduct=async(req,res)=>{
             result.deleted=true
             let swap = new DeletedProduct(result)
             swap.save()
-            AllProducts.findByIdAndUpdate(req.body.data.id,{deleted:true, active:false},(err,doc)=>{
+            AllProducts.findOneAndUpdate({refId:req.body.data.id},{deleted:true, active:false},(err,doc)=>{
                 if(err) res.json({failed:"Sorry! your request is failed"})
                     else res.json({success:"You have successfully updated product"})
             })
@@ -222,7 +221,7 @@ exports.activateProduct=async(req,res)=>{
             result.active=true
             let swap = new ActiveProduct(result)
             swap.save();
-            AllProducts.findByIdAndUpdate(req.body.data.id,{active:true},(err,doc)=>{
+            AllProducts.findOneAndUpdate({refId:req.body.data.id},{active:true},(err,doc)=>{
                 if(err) res.json({failed:"Sorry! your request is failed"})
                     else res.json({success:"You have successfully updated product"})
             })

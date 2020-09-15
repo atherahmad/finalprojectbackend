@@ -48,6 +48,10 @@ const AllProductsSchema= new mongoose.Schema({
     timeStamp:{
         type : Date,
         default: Date.now 
-      }
+      },
+    refId:{
+        type:String,
+        required:true
+    }
 })
 module.exports = mongoose.model("allproducts", AllProductsSchema)
