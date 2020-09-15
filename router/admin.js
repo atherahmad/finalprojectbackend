@@ -3,9 +3,12 @@ const admin = require("../controller/admin")
 const auth    = require("../middleware/checkAuthentication")
 
 router.get("/getquerries",auth.checkToken, admin.querriesList)
+router.get("/querrydetails/:id", auth.checkToken, admin.querryDetails)
 router.get("/getuserlist",auth.checkToken, admin.usersList)
+
 router.get("/getcomplaints",auth.checkToken, admin.complaintsList)
 router.get("/complaindetails/:id",auth.checkToken, admin.complainDetails)
+router.post("/handlecomplain",auth.checkToken, admin.complainHandler)
 
 
 router.post("/blockproduct", auth.checkToken, admin.blockProduct )

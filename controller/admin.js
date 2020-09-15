@@ -20,6 +20,17 @@ exports.querriesList = async (req, res) => {
         })
 }
 
+exports.querryDetails =async(req,res)=>{
+    Querry.findById(req.params.id,(err, doc) => {
+        if (err) res.json({ status: "failed", message: err })
+        else {
+            res.send({
+                success: doc
+            })
+        }
+    })
+
+}
 
 exports.usersList = async (req, res) => {
     User.find({},{_id:1, firstName:1, lastName:1, admin:1, email:1},(err, doc) => {
@@ -35,7 +46,7 @@ exports.usersList = async (req, res) => {
 
 
 exports.complaintsList = async (req, res) => {
-    Complaints.find({},{_id:1, productId:1, title:1,  timeStamp:1, completed:1},(err, doc) => {
+    Complaints.find({},{_id:1, productId:1, title:1,  timeStamp:1, completed:1, valid:1},(err, doc) => {
         if (err) res.json({ status: "failed", message: err })
         else {
             console.log(doc)
@@ -240,4 +251,13 @@ exports.productDetails=async(req,res)=>{
     } 
     )
 
+}
+
+exports.complainHandler=async(req,res)=>{
+    const {id, remarks, response} = req.body
+
+    Complaints.findByIdAndUpdate(id, {remarks, valid:response==="1"?true:false, completed:true}, (err,doc)=>{
+        if(err) res.json({failed:"Request failed please try again"})
+            else res.json({success:"You have successfully submitted the complain solution"})
+    })
 }

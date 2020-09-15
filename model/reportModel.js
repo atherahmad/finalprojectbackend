@@ -26,6 +26,12 @@ const ReportSchema = new mongoose.Schema({
   completed:{
     type:Boolean,
     required:true
+  },
+  remarks:{
+    type:String
+  },
+  valid:{
+    type:Boolean
   }
   
 });
