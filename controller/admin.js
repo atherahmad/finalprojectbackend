@@ -136,5 +136,39 @@ exports.allProducts = async (req, res) => {
 }
 
 exports.userDetails = async (req, res)=>{
-    console.log(req.bod, "req in admin user details")
+    console.log(req.params.userId, "req in admin user details")
+    User.findById(req.params.userId, {firstName:1, lastName:1,email:1,paypalId:1,phoneNumber:1, address:1,profileImage:1, admin:1}, (err,doc)=>{
+        if (err) res.json({
+            status: "failed",
+            message: err
+        })
+        else {
+            const { firstName, lastName, email, paypalId, phoneNumber, profileImage, admin } = doc
+            let street, city, zipCode;
+            if (doc.address) {
+                street = doc.address.street;
+                city = doc.address.city;
+                zipCode = doc.address.zipCode
+            }
+            else {
+                street = ""
+                city = ""
+                zipCode = ""
+            }
+            const profile = { firstName, lastName, email, paypalId, phoneNumber, street, city, zipCode, profileImage, admin }
+            res.json({
+                status: "success",
+                data: profile
+            })
+
+        }
+    })
+}
+
+exports.updateUser=async (req,res)=>{
+
+    User.findByIdAndUpdate(req.body.userId, {admin:req.body.admin}, (err,doc)=>{
+        if(err) res.json({failed:"request failed try again"})
+            else res.json({success:"You have updated user Access"})
+    })
 }

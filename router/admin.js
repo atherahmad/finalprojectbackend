@@ -18,5 +18,7 @@ router.get("/allproducts",auth.checkToken, admin.allProducts)
 
 router.get(`/userdetails/:userId`, auth.checkToken, admin.userDetails)
 
+router.post("/updateuser", auth.checkToken, admin.updateUser)
+
 
 module.exports = router
