@@ -4,6 +4,8 @@ const auth    = require("../middleware/checkAuthentication")
 
 router.get("/getquerries",auth.checkToken, admin.querriesList)
 router.get("/querrydetails/:id", auth.checkToken, admin.querryDetails)
+router.post("/handlequerry", auth.checkToken, admin.querryHandler)
+
 router.get("/getuserlist",auth.checkToken, admin.usersList)
 
 router.get("/getcomplaints",auth.checkToken, admin.complaintsList)

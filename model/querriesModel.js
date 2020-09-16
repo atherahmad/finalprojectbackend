@@ -26,6 +26,9 @@ const QuerriesSchema = new mongoose.Schema({
   completed:{
     type:Boolean,
     required:true
+  },
+  response:{
+    type:String
   }
   
 });

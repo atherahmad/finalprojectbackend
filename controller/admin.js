@@ -4,9 +4,8 @@ const Complaints=require("../model/reportModel")
 const ActiveProducts = require("../model/activeProductModel")
 const AllProducts = require("../model/allProductModel")
 const BlockedProducts=require("../model/blockedProductModel")
-const InactiveProducts=require("../model/inactiveProductModel")
-const SoldProducts = require("../model/soldProductModel")
-const DeletedProducts = require("../model/deletedProductModel")
+const emailCheck = require("../middleware/nodemailer")
+
 
 exports.querriesList = async (req, res) => {
 
@@ -30,6 +29,33 @@ exports.querryDetails =async(req,res)=>{
         }
     })
 
+}
+
+exports.querryHandler=async(req,res)=>{
+    
+    const {id,  response, email, name,subject} =req.body
+    let querry = await emailCheck.confirmation({
+        email:email,
+        subject:`RE: ${req.body.subject}`,
+        text:"",
+        html:`
+            Dear ${name}
+            <h2>Thanks for Contacting us!</h2>
+            <p>${response}</p>
+            <br/>
+            ==========================================================================
+            <br/>
+            Your querry
+            <h4>Subject: ${subject}</h4>
+            <h4>Message:</h4>
+            <p>${req.body.messageText}</p>`
+    })
+    if(querry) Querry.findByIdAndUpdate(id,{completed:true, response:response} ,(err,doc)=>{
+        if(err) res.json({failed:"Your request is failed please try again"})
+            else res.json({success: doc})
+
+    }) 
+        else res.json({status:"failed", message:"Sorry we are unable to proccess your request please try again later"})
 }
 
 exports.usersList = async (req, res) => {
@@ -241,7 +267,8 @@ exports.productDetails=async(req,res)=>{
         creator: 1,
         images: 1,
         active:1,
-        refId:1
+        refId:1,
+        blocked:1
     },
     (err,doc)=>{
         if(err) res.json({failed:"Request failed try again "})

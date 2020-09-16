@@ -21,7 +21,7 @@ exports.querry = async (req, res) => {
 
 
 
-    let resetLinkSent = await emailCheck.confirmation({
+    let querry = await emailCheck.confirmation({
         email:req.body.email,
         subject:req.body.subject,
         text:"",
@@ -36,8 +36,9 @@ exports.querry = async (req, res) => {
             <h4>Message:</h4>
             <p>${req.body.messageText}</p>`
     })
-    if(resetLinkSent) res.json({success: "We have recieved your querry"})
-        else res.json({status:"failed", message:"Sorry we are unable to proccess your request please try again later"})}
+    if(querry) res.json({success: "We have recieved your querry"})
+        else res.json({status:"failed", message:"Sorry we are unable to proccess your request please try again later"})
+    }
 
 })
 }
