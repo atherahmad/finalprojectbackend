@@ -3,10 +3,13 @@ const bcrypt =require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const jwtSecretKey = process.env.JWT_SECRET_KEY
 const emailCheck = require("../middleware/nodemailer")
+const adminJwtSecretKey = process.env.ADMIN_JWT_SECRET_KEY
 
 
 //Token Generator
 const createToken =  id => jwt.sign({id}, jwtSecretKey, {expiresIn:3600})
+
+const createAdminToken =  id => jwt.sign({id}, adminJwtSecretKey, {expiresIn:3600})
 
 
 
@@ -27,9 +30,11 @@ exports.signin=async (req,res)=>{
                 .then(async(isPassCorrect)=>{
                    if(isPassCorrect) {
                         if(result.confirmed){
-                                const token = await createToken(result.id)
+                                
                                 const {id, firstName, lastName,liked,email , admin} = result
-                                console.log(result, admin, "at signin ")
+                                let token=""
+                                if(admin) token = await createAdminToken(result.id)
+                                    else   token = await createToken(result.id)
                                 res.json({
                                     status   :"success",
                                     message  : "Welcome! you are successfully logged in. ",
