@@ -4,6 +4,7 @@ const User = require("../model/userModel");
 const fs = require("fs");
 
 exports.profile = async (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*")
   const uploader = async (path) => await cloudinary.uploads(path, "file");
 
   const file = req.file;
