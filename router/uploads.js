@@ -4,7 +4,7 @@ const upload = require("../middleware/multer");
 const auth = require("../middleware/checkAuthentication");
 
 router.post(
-  "/profile",
+  "/editprofile",
   auth.checkToken,
   upload.single("file"),
   uploads.profile

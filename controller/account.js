@@ -6,7 +6,6 @@ const SoldProducts = require("../model/soldProductModel");
 const InActiveProducts = require("../model/inactiveProductModel");
 const cp = require("child_process");
 const AllProducts = require("../model/allProductModel");
-const { cloudinary } = require("../utils/cloudinary");
 
 exports.getProfile = (req, res) => {
   User.findById(req.userId, (err, doc) => {
@@ -51,86 +50,6 @@ exports.getProfile = (req, res) => {
       });
     }
   });
-};
-
-exports.editProfile = async (req, res) => {
-  if (req.body.data) {
-    const {
-      firstName,
-      lastName,
-      paypalId,
-      phoneNumber,
-      street,
-      city,
-      zipCode,
-    } = req.body.data;
-    const profileData = {
-      firstName,
-      lastName,
-      paypalId,
-      phoneNumber,
-      address: {
-        street,
-        city,
-        zipCode,
-      },
-    };
-    await User.findByIdAndUpdate(req.userId, profileData, (err, doc) => {
-      if (err) res.json({ status: "failed", message: err });
-      else
-        res.json({
-          status: "success",
-          message: "Records updated successfully",
-        });
-    });
-    return;
-  }
-  let fileName;
-
-  /*  const storageTarget = multer.diskStorage({
-    destination: "public/avatars",
-    filename: (req, file, cb) => {
-      fileName = "a" + Date.now() + path.extname(file.originalname);
-      cb(null, fileName);
-    },
-  });
-  const upload = multer({ storage: storageTarget }).single(`file`); */
-
-  const upload = multer({ dest: "public/uploads/" }).single("file");
-  console.log(req.body, "while updating picture");
-
-  /* upload(req, res, async () => {
-    const {
-      firstName,
-      lastName,
-      paypalId,
-      phoneNumber,
-      street,
-      city,
-      zipCode,
-    } = req.body;
-
-    const profileData = {
-      firstName,
-      lastName,
-      paypalId,
-      phoneNumber,
-      address: {
-        street,
-        city,
-        zipCode,
-      },
-      profileImage: fileName,
-    };
-    await User.findByIdAndUpdate(req.userId, profileData, (err, doc) => {
-      if (err) res.json({ status: "failed", message: err });
-      else
-        res.json({
-          status: "success",
-          message: "Records updated successfully",
-        });
-    });
-  }); */
 };
 
 exports.getMyProducts = async (req, res) => {

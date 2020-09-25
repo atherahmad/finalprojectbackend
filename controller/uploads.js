@@ -6,14 +6,7 @@ const AllProducts = require("../model/allProductModel");
 const fs = require("fs");
 
 exports.profile = async (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  const uploader = async (path) => await cloudinary.uploads(path, "file");
-
-  const file = req.file;
-  const { path } = file;
-
-  const newPath = await uploader(path);
-
+  let profileData = {};
   const {
     firstName,
     lastName,
@@ -22,34 +15,52 @@ exports.profile = async (req, res) => {
     street,
     city,
     zipCode,
-  } = req.body;
+  } = req.body.data ? req.body.data : req.body;
 
-  const profileData = {
-    firstName,
-    lastName,
-    paypalId,
-    phoneNumber,
-    address: {
-      street,
-      city,
-      zipCode,
-    },
-    profileImage: newPath.url,
-  };
+  if (req.file) {
+    const uploader = async (path) => await cloudinary.uploads(path, "file");
+    const file = req.file;
+    const { path } = file;
+    const newPath = await uploader(path);
 
-  fs.unlinkSync(path);
+    profileData = {
+      firstName,
+      lastName,
+      paypalId,
+      phoneNumber,
+      address: {
+        street,
+        city,
+        zipCode,
+      },
+      profileImage: newPath.url,
+    };
 
-  if (newPath)
-    await User.findByIdAndUpdate(req.userId, profileData, (err, doc) => {
-      if (err) res.json({ status: "failed", message: err });
-      else
-        res.json({
-          status: "success",
-          message: "Records updated successfully",
-          data: doc,
-        });
-    });
-  else res.json({ status: "failed", message: "Failed to upload image" });
+    fs.unlinkSync(path);
+    if (!newPath)
+      return res.json({ status: "failed", message: "Failed to upload image" });
+  } else
+    profileData = {
+      firstName,
+      lastName,
+      paypalId,
+      phoneNumber,
+      address: {
+        street,
+        city,
+        zipCode,
+      },
+    };
+
+  await User.findByIdAndUpdate(req.userId, profileData, (err, doc) => {
+    if (err) res.json({ status: "failed", message: err });
+    else
+      res.json({
+        status: "success",
+        message: "Records updated successfully",
+        data: doc,
+      });
+  });
 };
 
 exports.product = async (req, res) => {
