@@ -9,7 +9,7 @@ const { urlencoded } = require("body-parser");
 
 connectDB();
 
-app.use(urlencoded({ extended: true }));
+app.use(urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use(express.static(path.join(__dirname + "/public")));

@@ -24,6 +24,7 @@ exports.uploads = (file, folder) => {
         folder: folder,
       }
     );
+    
   });
 };
 

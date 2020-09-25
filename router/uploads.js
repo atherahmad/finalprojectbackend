@@ -9,6 +9,11 @@ router.post(
   upload.single("file"),
   uploads.profile
 );
-router.post("/product", uploads.product);
+router.post(
+  "/newproduct",
+  auth.checkToken,
+  upload.array(`images`),
+  uploads.product
+);
 
 module.exports = router;
