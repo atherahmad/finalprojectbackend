@@ -97,11 +97,7 @@ exports.lastSeen = async (req, res) => {
     if (err) throw err;
     else res.json({ status: "success", message: "successfully added" });
   });
-  /* await User.findByIdAndUpdate(req.userId,condition,(err,doc)=>{
-        console.log(doc, "after last seen updat3e")
-        res.json({status:"success", comments:"you reached last seen"})
-    }) */
-  //{$addToSet:{lastSeen:req.body.data}}
+
 };
 
 exports.getLastSeen = async (req, res) => {
@@ -210,7 +206,6 @@ exports.getSoldProducts = async (req, res) => {
 };
 
 exports.inactiveProductDetails = async (req, res) => {
-  console.log("inactive details called");
   const id = req.params.id;
   let product = await InActiveProducts.findOne(
     { _id: id, creator: req.userId },

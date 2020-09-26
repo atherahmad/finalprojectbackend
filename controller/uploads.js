@@ -64,19 +64,6 @@ exports.profile = async (req, res) => {
 };
 
 exports.product = async (req, res) => {
-  const uploader = async (path) => await cloudinary.uploads(path, "images");
-
-  const urls = [];
-  const files = req.files;
-  for (const file of files) {
-    const { path } = file;
-    const newPath = await uploader(path);
-    urls.push(newPath.url);
-    fs.unlinkSync(path);
-  }
-
-  let priceRange;
-
   const {
     title,
     category,
@@ -85,14 +72,34 @@ exports.product = async (req, res) => {
     color,
     price,
     description,
-  } = req.body;
+  } = req.body.data ? req.body.data : req.body;
   const creator = req.userId;
+  let urls = [];
+  let priceRange;
+
   if (price >= 250) priceRange = 6;
   else if (price >= 200) priceRange = 5;
   else if (price >= 150) priceRange = 4;
   else if (price >= 100) priceRange = 3;
   else if (price >= 50) priceRange = 2;
   else priceRange = 1;
+
+  if (req.files) {
+    const uploader = async (path) => await cloudinary.uploads(path, "images");
+
+    const files = req.files;
+    for (const file of files) {
+      const { path } = file;
+      const newPath = await uploader(path);
+      if (!newPath)
+        return res.json({
+          status: "failed",
+          message: "Failed to upload image",
+        });
+      urls.push(newPath.url);
+      fs.unlinkSync(path);
+    }
+  }
 
   const newProduct = new ActiveProduct({
     title,

@@ -75,7 +75,6 @@ exports.complaintsList = async (req, res) => {
     Complaints.find({},{_id:1, productId:1, title:1,  timeStamp:1, completed:1, valid:1},(err, doc) => {
         if (err) res.json({ status: "failed", message: err })
         else {
-            console.log(doc)
             res.send({
                 success: doc
             })
@@ -92,7 +91,6 @@ exports.complainDetails=async(req,res)=>{
 }
 
 exports.blockProduct = async (req, res) => {
-    console.log(req.body.id, "comoing from block req")+
 
     await AllProducts.findById(req.body.id, {refId:1}, async (err,doc)=>{
 
@@ -100,10 +98,7 @@ exports.blockProduct = async (req, res) => {
 
             else await ActiveProducts.findById(doc.refId,(err,result)=>{
                 if(err) return res.json({failed:"Sorry! your request is failed"})
-                    else console.log(result)
                 if(result){
-        
-        
                     result.remove()
                     result=result.toObject()
                     result.active=false
@@ -195,7 +190,6 @@ exports.allProducts = async (req, res) => {
 }
 
 exports.userDetails = async (req, res)=>{
-    console.log(req.params.userId, "req in admin user details")
     User.findById(req.params.userId, {firstName:1, lastName:1,email:1,paypalId:1,phoneNumber:1, address:1,profileImage:1, admin:1}, (err,doc)=>{
         if (err) res.json({
             status: "failed",
@@ -234,7 +228,6 @@ exports.updateUser=async (req,res)=>{
 
 exports.searchProduct=async(req,res)=>{
 
-    console.log(req.body.id, req.body.type, "req.body.")
     if(req.body.type==="allproducts")
 
         AllProducts.findOne({refId:req.body.id}
@@ -259,7 +252,6 @@ exports.searchProduct=async(req,res)=>{
 }
 
 exports.productDetails=async(req,res)=>{
-    console.log(req.params.id, "in prog details")
     AllProducts.findOne({_id:req.params.id},{
         title: 1,
         price: 1,
@@ -273,7 +265,6 @@ exports.productDetails=async(req,res)=>{
     (err,doc)=>{
         if(err) res.json({failed:"Request failed try again "})
             else {
-                console.log(doc)
                 res.json({success:doc})}
     } 
     )

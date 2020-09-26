@@ -34,7 +34,6 @@ exports.createMessage=async(req,res)=>{
                                                 throw err
                                             }
                                             else {
-                                            console.log(doc, "in conversation")
                                             res.json({status:"success", message:"Successfully sent!, Conversation created", data:doc})
                                             }
                                         })
@@ -81,7 +80,7 @@ exports.getConversation=async(req,res)=>{
 
 exports.updateConversation=async(req,res)=>{
     const {conversationId,message}=req.body.data
-    if(message==="") return console.log("empty msg")
+    if(message==="") return 
     else
     await Conversation.findOneAndUpdate(
         {
@@ -101,11 +100,9 @@ exports.updateConversation=async(req,res)=>{
 }
 
 exports.deleteMessages=async(req,res)=>{
-    console.log(req.body.data, "req from fe")
     await Conversation.deleteMany({$or:[{senderId:req.userId},{recipentId:req.userId}], _id:{$in:req.body.selectedArray}},(err,doc)=>{
         if(err) res.json({failed:err})
         else {
-            console.log(doc)
             res.json({success:"you have successfully deleted messagges"})
         }
     })

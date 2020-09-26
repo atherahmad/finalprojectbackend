@@ -15,7 +15,7 @@ const connectDB = async () => {
         });
         console.log('Mongo Atlas server is ready');
     } catch (error) {
-        console.log(error.message);
+
         process.exit(1);
     }
 

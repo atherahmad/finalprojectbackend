@@ -101,9 +101,6 @@ exports.resetPassword = async (req, res) => {
           status: "failed",
           message: "Authentication failed! in jwt part",
         });
-      else {
-        console.log("its payload", decodedPayload);
-      }
     });
   } catch (error) {
     res.status(500).json({

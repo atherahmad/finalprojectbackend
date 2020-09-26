@@ -99,7 +99,6 @@ exports.signup = async (req, res) => {
       doc.html = `<b>To Confirm your email address please <a href="https://vigorous-einstein-134bd7.netlify.app/#/confirm/${doc.id}/${confirmationToken}">Click here!</a></b>`;
       doc.subject = "Confirm your email";
       let emailStatus = await emailCheck.confirmation(doc);
-      console.log(doc, "in confirmation ");
       if (emailStatus)
         res.json({
           status: "success",
@@ -185,7 +184,6 @@ exports.changePassword = async (req, res) => {
 };
 
 exports.confirmEmail = async (req, res) => {
-  console.log(req.body, "in confirmation");
   const { token } = req.body;
 
   await jwt.verify(token, jwtSecretKey, async (fail, decodedPayload) => {

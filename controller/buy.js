@@ -26,7 +26,6 @@ exports.allProucts = async (req, res) => {
 }
 
 exports.productDetails = async (req, res) => {
-    console.log("you reached")
 
     const id = req.params.id
     let product = await ActiveProducts.findById(id, {
@@ -106,7 +105,6 @@ exports.productsByCategory=async(req,res)=>{
 
     let category=req.params.type
     let result;
-    console.log("simple categry search")
     if(category==="0")
     result = await ActiveProducts.find({},{
         _id: 1,
@@ -142,10 +140,6 @@ exports.productsBySearch=async(req,res)=>{
     let category=req.params.type
     let result;
     var regex = new RegExp(".*" + text + ".*","i")
-    console.log(regex)
-
-    console.log("text categry search")
-
 
     if(category==="0")
 result = await ActiveProducts.find({title: {$regex:regex}},
@@ -179,7 +173,6 @@ result = await ActiveProducts.find({title: {$regex:regex}},{
 
 exports.productsByFilter=async(req,res)=>{
     const {color,category,condition,price}=req.body
-    console.log(color,category,condition,price)
     let query={}
     if (color!==0) query.color=color
     if(category!==0) query.category=category

@@ -22,7 +22,6 @@ exports.confirmation = async(doc)=>{
     text: text, // plain text body
     html: html// html body
   });
-  console.log("Message sent: %s", info.messageId);
   if(info.messageId) return true
     else return false
 
