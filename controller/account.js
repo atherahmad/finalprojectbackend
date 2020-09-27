@@ -97,7 +97,6 @@ exports.lastSeen = async (req, res) => {
     if (err) throw err;
     else res.json({ status: "success", message: "successfully added" });
   });
-
 };
 
 exports.getLastSeen = async (req, res) => {
@@ -258,7 +257,6 @@ exports.editProduct = async (req, res) => {
   });
   const upload = multer({ storage: storageTarget }).array("files", 6);
   upload(req, res, async () => {
-    console.log()
     const {
       _id,
       title,
