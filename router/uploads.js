@@ -15,5 +15,10 @@ router.post(
   upload.array(`images`),
   uploads.product
 );
-
+router.post(
+  "/editproduct",
+  auth.checkToken,
+  upload.array(`images`),
+  uploads.editProduct
+);
 module.exports = router;

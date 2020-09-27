@@ -258,6 +258,7 @@ exports.editProduct = async (req, res) => {
   });
   const upload = multer({ storage: storageTarget }).array("files", 6);
   upload(req, res, async () => {
+    console.log()
     const {
       _id,
       title,

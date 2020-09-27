@@ -4,6 +4,7 @@ const ActiveProduct = require("../model/activeProductModel");
 const AllProducts = require("../model/allProductModel");
 
 const fs = require("fs");
+const { url } = require("inspector");
 
 exports.profile = async (req, res) => {
   let profileData = {};
@@ -154,4 +155,88 @@ exports.product = async (req, res) => {
       });
     }
   });
+};
+
+exports.editProduct = async (req, res) => {
+  let {
+    title,
+    category,
+    condition,
+    quantity,
+    color,
+    price,
+    description,
+    _id,
+    oldImages,
+  } = req.body.data ? req.body.data : req.body;
+  let priceRange;
+
+  let images=JSON.parse(oldImages)
+
+  if (price >= 250) priceRange = 6;
+  else if (price >= 200) priceRange = 5;
+  else if (price >= 150) priceRange = 4;
+  else if (price >= 100) priceRange = 3;
+  else if (price >= 50) priceRange = 2;
+  else priceRange = 1;
+
+  const creator = req.userId;
+
+  let urls = [];
+
+   if (req.files) {
+    const uploader = async (path) => await cloudinary.uploads(path, "images");
+    const files = req.files;
+
+    for (const file of files) {
+      const { path, originalname } = file;
+      const newPath = await uploader(path);
+      if (!newPath)
+        return res.json({
+          status: "failed",
+          message: "Failed to upload image",
+        });
+      urls.push(newPath.url);
+      fs.unlinkSync(path);
+      images[parseInt(originalname)] = newPath.url;
+    }
+  } 
+
+     await ActiveProduct.findOneAndUpdate(
+    { _id, creator },
+    {
+      title,
+      category,
+      condition,
+      quantity,
+      color,
+      price,
+      description,
+      images: images,
+      priceRange,
+    },
+    async (err, doc) => {
+      if (err) throw err;
+      else {
+        await AllProducts.findOneAndUpdate(
+          { refId: _id },
+          {
+            title,
+            category,
+            condition,
+            quantity,
+            color,
+            price,
+            description,
+            priceRange,
+            images: images,
+          },
+          (err, doc) => {
+            if (err) res.json({ status: "failed", message: "Request failed" });
+            else res.json({ status: "success", doc: doc });
+          }
+        );
+      }
+    }
+  ); 
 };
