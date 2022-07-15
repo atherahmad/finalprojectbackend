@@ -1,4 +1,4 @@
-const emailUser = process.env.MAIL_USER;
+/* const emailUser = process.env.MAIL_USER;
 const emailPass = process.env.MAIL_PASS;
 const nodemailer = require("nodemailer");
 
@@ -25,4 +25,43 @@ exports.confirmation = async(doc)=>{
   if(info.messageId) return true
     else return false
 
+} */
+
+const sgMail = require('@sendgrid/mail');
+
+exports.confirmation = async(doc)=>{
+  const {email, subject, text,html} = doc
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const msg = {
+  to: email,
+  from: process.env.MAIL_USER, // Use the email address or domain you verified above
+  subject: subject,
+  text: "text",
+  html: html,
+};
+//ES6
+/* sgMail
+  .send(msg)
+  .then(() => {}, error => {
+    console.error(error);
+
+    if (error.response) {
+      console.error(error.response.body)
+    }
+  }); */
+
+
+//ES8
+
+    const emailStatus = await sgMail.send(msg);
+    if(emailStatus[0].statusCode) {
+      return true
+    }
+
+  else {
+      console.error(error.response.body)
+      return false
+    }
+  
 }

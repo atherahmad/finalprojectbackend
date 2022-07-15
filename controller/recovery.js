@@ -30,15 +30,18 @@ exports.resetLink = async (req, res) => {
     previousPass: userCheck.pass,
   });
   newPassRcovery.save(async (err, doc) => {
-    if (err) res.json({ status: "failed", message: err });
-    else {
-      let resetLinkSent = await emailCheck.confirmation({
+    if (err) return res.json({ status: "failed", message: err });
+    
+      const resetLinkSent = await emailCheck.confirmation({
         id: userCheck._id,
         email: userCheck.email,
         subject: "Reset Password at c2c",
         text: "",
         html: `<b>To Change your passowrd please <a href="https://vigorous-einstein-134bd7.netlify.app/#/resetpass/${payload.id}/${resetToken}">Click here!</a></b>`,
       });
+
+      console.log("in recovery.js email status", resetLinkSent)
+
       if (resetLinkSent)
         res.json({
           status: "success",
@@ -51,7 +54,7 @@ exports.resetLink = async (req, res) => {
           message:
             "Sorry we are unable to proccess your request please try again later",
         });
-    }
+    
   });
 };
 

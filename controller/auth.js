@@ -99,6 +99,7 @@ exports.signup = async (req, res) => {
       doc.html = `<b>To Confirm your email address please <a href="https://vigorous-einstein-134bd7.netlify.app/#/confirm/${doc.id}/${confirmationToken}">Click here!</a></b>`;
       doc.subject = "Confirm your email";
       let emailStatus = await emailCheck.confirmation(doc);
+      console.log("in auth.js email status", emailStatus)
       if (emailStatus)
         res.json({
           status: "success",
